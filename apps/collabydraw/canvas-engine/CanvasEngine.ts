@@ -98,6 +98,7 @@ export class CanvasEngine {
   private selectedShape: Shape | null = null;
   private existingShapes: Shape[];
   private SelectionController: SelectionController;
+  private shapesMarkedForErase: Set<string> = new Set();
 
   private socket: WebSocket | null = null;
   private isConnected = false;
@@ -593,6 +594,11 @@ export class CanvasEngine {
 
   setTool(tool: ToolType) {
     this.activeTool = tool;
+    // Clear any marked shapes when switching away from eraser
+    if (this.shapesMarkedForErase.size > 0) {
+      this.shapesMarkedForErase.clear();
+      this.clearCanvas();
+    }
     if (tool !== "selection") {
       this.selectedShape = null;
       this.SelectionController.setSelectedShape(null);
@@ -738,6 +744,13 @@ export class CanvasEngine {
       if (isBeingStreamed) {
         return;
       }
+      
+      // Apply reduced opacity for shapes marked for erasing
+      const isMarkedForErase = shape.id ? this.shapesMarkedForErase.has(shape.id) : false;
+      if (isMarkedForErase) {
+        this.ctx.globalAlpha = 0.3;
+      }
+      
       if (shape.type === "rectangle") {
         this.drawRect(
           shape.x,
@@ -825,6 +838,11 @@ export class CanvasEngine {
           shape.fontSize,
           shape.textAlign
         );
+      }
+      
+      // Reset opacity after rendering
+      if (isMarkedForErase) {
+        this.ctx.globalAlpha = 1.0;
       }
     });
 
@@ -1097,9 +1115,14 @@ export class CanvasEngine {
   };
 
   mouseUpHandler = (e: MouseEvent) => {
+    // Finalize eraser - actually delete marked shapes
+    if (this.activeTool === "eraser") {
+      this.finalizeErase();
+      return;
+    }
+    
     if (
       this.activeTool !== "free-draw" &&
-      this.activeTool !== "eraser" &&
       this.activeTool !== "line" &&
       this.activeTool !== "arrow"
     ) {
@@ -2376,44 +2399,68 @@ export class CanvasEngine {
     );
 
     if (shapeIndex !== -1) {
-      const erasedShape = this.existingShapes[shapeIndex];
-      this.existingShapes.splice(shapeIndex, 1);
+      const shape = this.existingShapes[shapeIndex];
+      // Mark shape for erasing instead of immediately deleting
+      if (shape.id) {
+        this.shapesMarkedForErase.add(shape.id);
+        this.clearCanvas();
+      }
+    }
+  }
+
+  finalizeErase() {
+    // Actually delete the shapes marked for erasing
+    if (this.shapesMarkedForErase.size > 0) {
+      const shapesToErase = Array.from(this.shapesMarkedForErase);
+      
+      shapesToErase.forEach((shapeId) => {
+        const shapeIndex = this.existingShapes.findIndex(
+          (shape) => shape.id === shapeId
+        );
+        
+        if (shapeIndex !== -1) {
+          const erasedShape = this.existingShapes[shapeIndex];
+          this.existingShapes.splice(shapeIndex, 1);
+          
+          if (this.isStandalone) {
+            try {
+              localStorage.setItem(
+                LOCALSTORAGE_CANVAS_KEY,
+                JSON.stringify(this.existingShapes)
+              );
+            } catch (e) {
+              console.error("Error saving shapes to localStorage:", e);
+            }
+          } else if (this.sendMessage && this.roomId) {
+            try {
+              this.sendMessage?.(
+                JSON.stringify({
+                  type: WsDataType.ERASER,
+                  id: erasedShape.id,
+                  roomId: this.roomId,
+                })
+              );
+            } catch (e) {
+              MessageQueue.enqueue({
+                type: WsDataType.ERASER,
+                id: erasedShape.id,
+                message: null,
+                roomId: this.roomId,
+                userId: this.userId!,
+                userName: this.userName!,
+                timestamp: new Date().toISOString(),
+                participants: null,
+                connectionId: this.connectionId!,
+              });
+              console.error("Error sending shape erase ws message", e);
+            }
+          }
+        }
+      });
+      
+      this.shapesMarkedForErase.clear();
       this.notifyShapeCountChange();
       this.clearCanvas();
-
-      if (this.isStandalone) {
-        try {
-          localStorage.setItem(
-            LOCALSTORAGE_CANVAS_KEY,
-            JSON.stringify(this.existingShapes)
-          );
-        } catch (e) {
-          console.error("Error saving shapes to localStorage:", e);
-        }
-      } else if (this.sendMessage && this.roomId) {
-        try {
-          this.sendMessage?.(
-            JSON.stringify({
-              type: WsDataType.ERASER,
-              id: erasedShape.id,
-              roomId: this.roomId,
-            })
-          );
-        } catch (e) {
-          MessageQueue.enqueue({
-            type: WsDataType.ERASER,
-            id: erasedShape.id,
-            message: null,
-            roomId: this.roomId,
-            userId: this.userId!,
-            userName: this.userName!,
-            timestamp: new Date().toISOString(),
-            participants: null,
-            connectionId: this.connectionId!,
-          });
-          console.error("Error sending shape erase ws message", e);
-        }
-      }
     }
   }
 

@@ -18,6 +18,8 @@ import {
     Linkedin,
     Share2,
     Star,
+    Maximize,
+    Minimize,
 } from "lucide-react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -51,10 +53,36 @@ export function AppSidebar({ isOpen, onClose, canvasColor, setCanvasColor, isMob
     const [clearDialogOpen, setClearDialogOpen] = useState(false);
     const { theme, setTheme } = useTheme();
     const { data: session } = useSession();
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
     const pathname = usePathname();
     const [isShareOpen, setIsShareOpen] = useState(false);
     const decodedPathname = decodeURIComponent(pathname);
+
+    const toggleFullscreen = async () => {
+        try {
+            if (!document.fullscreenElement) {
+                await document.documentElement.requestFullscreen();
+                setIsFullscreen(true);
+            } else {
+                if (document.exitFullscreen) {
+                    await document.exitFullscreen();
+                    setIsFullscreen(false);
+                }
+            }
+        } catch (error) {
+            console.error('Error toggling fullscreen:', error);
+        }
+    };
+
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+        };
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    }, []);
 
     useEffect(() => {
         const handleOutsideClick = (e: MouseEvent) => {
@@ -117,6 +145,12 @@ export function AppSidebar({ isOpen, onClose, canvasColor, setCanvasColor, isMob
                                     <SidebarItem icon={DownloadIcon} label="Export Drawing" onClick={onExportCanvas} />
                                     <SidebarItem icon={Upload} label="Import Drawing" onClick={onImportCanvas} />
                                     <SidebarItem icon={Share2} label="Live collaboration" onClick={() => setIsShareOpen(true)} />
+                                    <SidebarItem 
+                                        icon={isFullscreen ? Minimize : Maximize} 
+                                        label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"} 
+                                        onClick={toggleFullscreen}
+                                        shortcut="F11"
+                                    />
                                     {session?.user && session?.user.id ? (
                                         <CreateRoomDialog open={isShareOpen} onOpenChange={setIsShareOpen} />
                                     ) : (
@@ -135,6 +169,12 @@ export function AppSidebar({ isOpen, onClose, canvasColor, setCanvasColor, isMob
                                     </Button>
                                     <RoomSharingDialog open={isShareOpen} onOpenChange={setIsShareOpen} link={`${BASE_URL}/${decodedPathname}`} />
                                     <SidebarItem icon={Share2} label="Share collaboration" onClick={() => setIsShareOpen(true)} />
+                                    <SidebarItem 
+                                        icon={isFullscreen ? Minimize : Maximize} 
+                                        label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"} 
+                                        onClick={toggleFullscreen}
+                                        shortcut="F11"
+                                    />
                                     <SidebarItem icon={Trash} label="Reset the canvas" onClick={() => setClearDialogOpen(true)} />
                                 </>
                             )}
