@@ -19,7 +19,7 @@ import {
     Maximize,
     Minimize,
 } from "lucide-react"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ColorPicker } from "@/components/color-picker"
 import { ClearCanvasDialog } from "./clear-canvas-dialog"
@@ -27,7 +27,6 @@ import { cn } from "@/lib/utils"
 import { useTheme } from "next-themes"
 import { signOut, useSession } from "next-auth/react"
 import { redirect, usePathname } from "next/navigation"
-import Link from "next/link"
 import { CollabAuthPrompt } from "./CollabAuthPrompt"
 import { RoomSharingDialog } from "./RoomSharingDialog"
 import { BASE_URL } from "@/config/constants"
