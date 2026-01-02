@@ -15,9 +15,7 @@ import {
     TrashIcon,
     DownloadIcon,
     Upload,
-    Linkedin,
     Share2,
-    Star,
     Maximize,
     Minimize,
 } from "lucide-react"
@@ -49,7 +47,6 @@ interface SidebarProps {
 }
 
 export function AppSidebar({ isOpen, onClose, canvasColor, setCanvasColor, isMobile, roomName, isStandalone, onClearCanvas, onExportCanvas, onImportCanvas }: SidebarProps) {
-    const [stars, setStars] = useState<number | null>(null);
     const [clearDialogOpen, setClearDialogOpen] = useState(false);
     const { theme, setTheme } = useTheme();
     const { data: session } = useSession();
@@ -109,19 +106,6 @@ export function AppSidebar({ isOpen, onClose, canvasColor, setCanvasColor, isMob
         }
         return () => document.body.classList.remove("overflow-hidden")
     }, [isOpen])
-
-    useEffect(() => {
-        const fetchRepoMetaData = async () => {
-            try {
-                const res = await fetch('https://api.github.com/repos/coderomm/CollabyDraw');
-                const data = await res.json();
-                setStars(data.stargazers_count);
-            } catch (error) {
-                console.error('Error fetching GitHub repo data:', error);
-            }
-        }
-        fetchRepoMetaData();
-    }, [])
 
     return (
         <>
@@ -247,34 +231,3 @@ function SidebarItem({ icon: Icon, label, shortcut, className, onClick }: Sideba
     )
 }
 
-interface SidebarLinkItemProps {
-    icon: React.ElementType
-    label: string
-    shortcut?: string
-    className?: string
-    url: string
-}
-
-function SidebarLinkItem({ icon: Icon, label, shortcut, className, url }: SidebarLinkItemProps) {
-    return (
-        <Link
-            className={cn(
-                buttonVariants({ variant: "ghost" }),
-                "flex h-10 w-full justify-start gap-2 rounded-md px-3 text-sm font-medium transition-colors text-color-on-surface hover:text-color-on-surface bg-transparent hover:bg-button-hover-bg focus-visible:shadow-brand-color-shadow focus-visible:outline-none focus-visible:ring-0 active:bg-button-hover-bg active:border active:border-brand-active dark:hover:bg-w-button-hover-bg",
-                className,
-            )}
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            title={label}
-        >
-            <Icon className="h-4 w-4" />
-            <span>{label}</span>
-            {shortcut && (
-                <kbd className="ml-auto inline-flex h-5 select-none items-center gap-1 rounded px-1.5 font-mono text-[10px] font-medium opacity-100 bg-muted text-muted-foreground dark:text-[var(--RadioGroup-choice-color-on)] dark:bg-[var(--RadioGroup-choice-background-on)] dark:hover:bg-[var(--RadioGroup-choice-background-on-hover)]">
-                    {shortcut}
-                </kbd>
-            )}
-        </Link>
-    )
-}
