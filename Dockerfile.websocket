@@ -16,8 +16,9 @@ COPY apps/ws ./apps/ws
 # Install dependencies
 RUN npm install --legacy-peer-deps
 
-# Generate Prisma Client
+# Generate Prisma Client - install db dependencies first
 WORKDIR /app/packages/db
+RUN npm install
 RUN npx prisma generate
 
 # Build the websocket server
