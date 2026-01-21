@@ -18,7 +18,7 @@ RUN npm install --legacy-peer-deps
 
 # Generate Prisma Client
 WORKDIR /app/packages/db
-RUN prisma generate
+RUN npx prisma generate
 
 # Build the websocket server
 WORKDIR /app/apps/ws
