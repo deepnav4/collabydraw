@@ -16,9 +16,11 @@ COPY apps/collabydraw ./apps/collabydraw
 # Install dependencies (postinstall will run prisma generate automatically)
 RUN npm install --legacy-peer-deps
 
-# Build the application
-WORKDIR /app
+# Build the frontend application directly
+WORKDIR /app/apps/collabydraw
 RUN npm run build
+
+WORKDIR /app
 
 # Production stage
 FROM node:20-alpine AS runner
