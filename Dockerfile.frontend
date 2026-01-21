@@ -13,13 +13,8 @@ COPY pnpm-workspace.yaml* ./
 COPY packages ./packages
 COPY apps/collabydraw ./apps/collabydraw
 
-# Install dependencies
+# Install dependencies (postinstall will run prisma generate automatically)
 RUN npm install --legacy-peer-deps
-
-# Generate Prisma Client - install db dependencies first
-WORKDIR /app/packages/db
-RUN npm install
-RUN npx prisma generate
 
 # Build the application
 WORKDIR /app
