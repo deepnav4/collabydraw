@@ -6,14 +6,15 @@ RUN npm install -g pnpm prisma
 WORKDIR /app
 
 # Copy workspace configuration
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml turbo.json ./
+COPY pnpm-workspace.yaml package.json turbo.json ./
+COPY package-lock.json* pnpm-lock.yaml* bun.lock* ./
 
 # Copy all packages
 COPY packages ./packages
 COPY apps/collabydraw ./apps/collabydraw
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # Generate Prisma Client
 WORKDIR /app/packages/db
