@@ -1,20 +1,20 @@
 FROM node:20-alpine AS base
 
-# Install pnpm
-RUN npm install -g pnpm prisma
+# Install global dependencies
+RUN npm install -g prisma esbuild
 
 WORKDIR /app
 
-# Copy workspace configuration
-COPY pnpm-workspace.yaml package.json turbo.json ./
-COPY package-lock.json* pnpm-lock.yaml* bun.lock* ./
+# Copy package files
+COPY package*.json turbo.json ./
+COPY pnpm-workspace.yaml* ./
 
 # Copy all packages
 COPY packages ./packages
 COPY apps/ws ./apps/ws
 
 # Install dependencies
-RUN pnpm install --no-frozen-lockfile
+RUN npm install --legacy-peer-deps
 
 # Generate Prisma Client
 WORKDIR /app/packages/db
@@ -22,7 +22,7 @@ RUN prisma generate
 
 # Build the websocket server
 WORKDIR /app/apps/ws
-RUN pnpm run build
+RUN npm run build
 
 # Production stage
 FROM node:20-alpine AS runner

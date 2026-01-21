@@ -1,20 +1,20 @@
 FROM node:20-alpine AS base
 
-# Install pnpm
-RUN npm install -g pnpm prisma
+# Install global dependencies
+RUN npm install -g prisma turbo
 
 WORKDIR /app
 
-# Copy workspace configuration
-COPY pnpm-workspace.yaml package.json turbo.json ./
-COPY package-lock.json* pnpm-lock.yaml* bun.lock* ./
+# Copy package files
+COPY package*.json turbo.json ./
+COPY pnpm-workspace.yaml* ./
 
 # Copy all packages
 COPY packages ./packages
 COPY apps/collabydraw ./apps/collabydraw
 
 # Install dependencies
-RUN pnpm install --no-frozen-lockfile
+RUN npm install --legacy-peer-deps
 
 # Generate Prisma Client
 WORKDIR /app/packages/db
@@ -22,12 +22,12 @@ RUN prisma generate
 
 # Build the application
 WORKDIR /app
-RUN pnpm run build --filter=collabydraw
+RUN npm run build
 
 # Production stage
 FROM node:20-alpine AS runner
 
-RUN npm install -g pnpm prisma
+RUN npm install -g prisma
 
 WORKDIR /app
 
@@ -48,4 +48,4 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-CMD ["pnpm", "run", "start"]
+CMD ["npm", "run", "start:collabydraw"]
