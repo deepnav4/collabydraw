@@ -18,7 +18,7 @@ export default function AboutPage() {
                         an account.
                     </p>
 
-                    <h3 className="mt-3 mb-1 lg:mt-8 lg:mb-2">✅ Core Features</h3>
+                    <h3 className="mt-3 mb-1 lg:mt-8 lg:mb-2"> Core Features</h3>
                     <ul className="flex flex-col gap-1">
                         <li><strong>Canvas Drawing:</strong> Freehand, shapes, and editable text</li>
                         <li><strong>Rough.js Support:</strong> Optional sketch-style drawing</li>
