@@ -18,6 +18,7 @@ RUN npm install --legacy-peer-deps
 
 # Build the websocket server
 WORKDIR /app/apps/ws
+RUN npm install --legacy-peer-deps
 RUN npm run build
 
 # Production stage
