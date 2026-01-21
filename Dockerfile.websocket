@@ -1,0 +1,44 @@
+FROM node:20-alpine AS base
+
+# Install pnpm
+RUN npm install -g pnpm prisma
+
+WORKDIR /app
+
+# Copy workspace configuration
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml turbo.json ./
+
+# Copy all packages
+COPY packages ./packages
+COPY apps/ws ./apps/ws
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Generate Prisma Client
+WORKDIR /app/packages/db
+RUN prisma generate
+
+# Build the websocket server
+WORKDIR /app/apps/ws
+RUN pnpm run build
+
+# Production stage
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+# Copy built files and dependencies
+COPY --from=base /app/apps/ws/dist ./apps/ws/dist
+COPY --from=base /app/apps/ws/package.json ./apps/ws/package.json
+COPY --from=base /app/node_modules ./node_modules
+COPY --from=base /app/packages ./packages
+
+WORKDIR /app/apps/ws
+
+ENV NODE_ENV=production
+ENV PORT=8080
+
+EXPOSE 8080
+
+CMD ["node", "dist/index.js"]
