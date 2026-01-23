@@ -125,8 +125,8 @@ export function AppSidebar({ isOpen, onClose, canvasColor, setCanvasColor, isMob
                             {isStandalone ? (
                                 <>
                                     <SidebarItem icon={TrashIcon} label="Clear canvas" onClick={() => setClearDialogOpen(true)} />
-                                    <SidebarItem icon={DownloadIcon} label="Export Drawing" onClick={onExportCanvas} />
-                                    <SidebarItem icon={Upload} label="Import Drawing" onClick={onImportCanvas} />
+                                    {/* <SidebarItem icon={DownloadIcon} label="Export Drawing" onClick={onExportCanvas} /> */}
+                                    {/* <SidebarItem icon={Upload} label="Import Drawing" onClick={onImportCanvas} /> */}
                                     <SidebarItem icon={Share2} label="Live collaboration" onClick={() => setIsShareOpen(true)} />
                                     <SidebarItem 
                                         icon={isFullscreen ? Minimize : Maximize} 

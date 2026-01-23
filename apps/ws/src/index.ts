@@ -91,7 +91,7 @@ wss.on("connection", function connection(ws, req) {
       connectionId,
     })
   );
-  console.log("✅ Sent CONNECTION_READY to:", connectionId);
+  console.log(" Sent CONNECTION_READY to:", connectionId);
 
   ws.on("error", (err) =>
     console.error(`WebSocket error for user ${userId}:`, err)

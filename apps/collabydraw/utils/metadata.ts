@@ -15,8 +15,8 @@ export const baseMetadata: Metadata = {
     "digital whiteboard",
     "end-to-end encrypted whiteboard",
   ],
-  authors: [{ name: "Om Sharma" }],
-  creator: "Om Sharma",
+  authors: [{ name: "Navdeep Singh" }],
+  creator: "Navdeep Singh",
   publisher: "Collabydraw",
 
   openGraph: {
@@ -31,7 +31,7 @@ export const baseMetadata: Metadata = {
       {
         url: "/brand/CollabyDraw1.png",
         width: 1349,
-        height: 767,
+        height: 767,  
         alt: "Collabydraw - Collaborative Drawing Tool UI",
       },
     ],
@@ -42,7 +42,7 @@ export const baseMetadata: Metadata = {
     title: "Collabydraw — Collaborative whiteboarding made easy",
     description:
       "Collabydraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them.",
-    creator: "@1omsharma",
+    creator: "@navdeepsingh",
     images: ["/brand/CollabyDraw1.png"],
   },
 

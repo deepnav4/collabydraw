@@ -90,20 +90,10 @@ https://collabydraw.app/#room=abc123,xyz456
 
 ### 📂 Github Repo
 
-[github.com/coderomm/CollabyDraw](https://github.com/coderomm/CollabyDraw)
+[https://github.com/deepnav4/collabydraw](https://github.com/deepnav4/collabydraw)
 
 ---
 
-### 📽️ YouTube Demo
-
-<iframe width="100%" height="400" src="https://www.youtube.com/embed/NNVdRCoFnK0" frameborder="0" allowfullscreen></iframe>
-
----
-
-### 🐦 Tweet Embed
-
-<Tweet id="1711737824058880576" />
-
-`;
+`
 
 export default detailsContent;
